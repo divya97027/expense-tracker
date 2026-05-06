@@ -1,44 +1,42 @@
-import { useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
-import { AuthContext } from './context/AuthContext';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
-  if (loading) return <div>Loading...</div>;
-  return user ? children : <Navigate to="/login" />;
-};
+import { useState, useEffect } from 'react';
+import AddExpense from './components/AddExpense';
+import ExpenseList from './components/ExpenseList';
+import Summary from './components/Summary';
+import ExpenseChart from './components/ExpenseChart';
+import './App.css';
 
 function App() {
-  const { user, logout } = useContext(AuthContext);
+  const [transactions, setTransactions] = useState(() => {
+    const saved = localStorage.getItem('transactions');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+  }, [transactions]);
+
+  const handleAdd = (transaction) => {
+    setTransactions([...transactions, transaction]);
+  };
+
+  const handleDelete = (id) => {
+    setTransactions(transactions.filter(t => t.id !== id));
+  };
 
   return (
-    <Router>
-      <nav className="navbar glass">
-        <div className="nav-brand">ExpenseTracker</div>
-        <div>
-          {user ? (
-            <button onClick={logout} className="btn btn-danger">Logout</button>
-          ) : (
-            <Link to="/login" className="btn btn-primary">Login</Link>
-          )}
-        </div>
-      </nav>
-      <Routes>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-        <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
-        <Route 
-          path="/" 
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } 
-        />
-      </Routes>
-    </Router>
+    <div className="app">
+      <div className="app-header">
+        <h1>💰 Expense Tracker</h1>
+        <p>Track your income & expenses smartly</p>
+      </div>
+      <Summary transactions={transactions} />
+      <div className="chart-card">
+        <h3>📊 Expense Breakdown</h3>
+        <ExpenseChart transactions={transactions} />
+      </div>
+      <AddExpense onAdd={handleAdd} />
+      <ExpenseList transactions={transactions} onDelete={handleDelete} />
+    </div>
   );
 }
 
