@@ -16,13 +16,13 @@ function ExpenseChart({ transactions }) {
       return acc;
     }, []);
 
-  if (categoryData.length === 0) {
-    return (
-      <div style={{ textAlign: 'center', padding: '30px', color: '#555' }}>
-        📊 Expenses add karo — chart yahan dikhega
-      </div>
-    );
-  }
+ if (categoryData.length === 0) {
+  return (
+    <div style={{ textAlign: 'center', padding: '30px', color: '#bbb' }}>
+      📊 Add expenses to see your breakdown chart
+    </div>
+  );
+}
 
   return (
     <ResponsiveContainer width="100%" height={220}>
